@@ -5,9 +5,9 @@ If (! $VCSA) {
 	If (Test-Path $Credfile) {
 		$LoadedCredentials = Import-Clixml $Credfile
 		$creds = New-Object System.Management.Automation.PsCredential($LoadedCredentials.Username,($LoadedCredentials.Password | ConvertTo-SecureString))
-		$Services = get-wmiobject -Credential $creds win32_service -ComputerName $VIServer -ErrorAction SilentlyContinue| Where {$_.DisplayName -like "VMware*" }
+		$Services = get-wmiobject -Credential $creds win32_service -ComputerName $VIServer -ErrorAction SilentlyContinue| Where {$_.DisplayName -like "VMware*" -or $_.Displayname -like "Vcenter*" }
 	} Else {
-		$Services = get-wmiobject win32_service -ComputerName $VIServer -ErrorAction SilentlyContinue | Where {$_.DisplayName -like "VMware*" }
+		$Services = get-wmiobject win32_service -ComputerName $VIServer -ErrorAction SilentlyContinue | Where {$_.DisplayName -like "VMware*" -or $_.Displayname -like "Vcenter*" }
 		if ($Error[0].Exception.Message -match "Access is denied.") { 
 			# Access Denied Error found so asking to store windows credentials in a file for future use
 			Write-Host "Current windows credentials do not allow for access to WMI on the host $VIServer, please enter Administrator credentials for this check to work, these will be stored in an encrypted file: $credfile" 
@@ -18,7 +18,7 @@ If (! $VCSA) {
 			$Store.Username = $Username
 			$Store.Password = $Pass
 			$Store | Export-Clixml $credfile
-		$Services = get-wmiobject win32_service -ComputerName $VIserver -ErrorAction SilentlyContinue | Where {$_.DisplayName -like "VMware*" }
+		$Services = get-wmiobject win32_service -ComputerName $VIserver -ErrorAction SilentlyContinue | Where {$_.DisplayName -like "VMware*" -or $_.Displayname -like "Vcenter*" }
 		}
 	}
 
